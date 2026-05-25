@@ -1,0 +1,98 @@
+{
+  "files": {
+    "screen/HomeScreen.tsx": {
+      "modifiedRanges": [
+        {
+          "start": 1,
+          "end": 571
+        }
+      ],
+      "importsChanged": true,
+      "lastEdit": "2026-05-15T17:14:19.310Z"
+    },
+    "models/Producto.ts": {
+      "modifiedRanges": [
+        {
+          "start": 1,
+          "end": 25
+        }
+      ],
+      "importsChanged": false,
+      "lastEdit": "2026-05-15T15:40:12.100Z"
+    },
+    "components/ProductoCard.tsx": {
+      "modifiedRanges": [
+        {
+          "start": 1,
+          "end": 222
+        }
+      ],
+      "importsChanged": true,
+      "lastEdit": "2026-05-16T16:33:39.271Z"
+    },
+    "screen/LoginScreen.tsx": {
+      "modifiedRanges": [
+        {
+          "start": 1,
+          "end": 375
+        }
+      ],
+      "importsChanged": true,
+      "lastEdit": "2026-05-15T17:01:11.585Z"
+    },
+    "screen/RegisterScreen.tsx": {
+      "modifiedRanges": [
+        {
+          "start": 1,
+          "end": 521
+        }
+      ],
+      "importsChanged": true,
+      "lastEdit": "2026-05-15T17:07:44.011Z"
+    },
+    "screen/AddScreen.tsx": {
+      "modifiedRanges": [
+        {
+          "start": 1,
+          "end": 200
+        }
+      ],
+      "importsChanged": true,
+      "lastEdit": "2026-05-15T17:23:39.779Z"
+    },
+    "screen/SearchProductScreen.tsx": {
+      "modifiedRanges": [
+        {
+          "start": 1,
+          "end": 579
+        }
+      ],
+      "importsChanged": true,
+      "lastEdit": "2026-05-16T16:39:06.141Z"
+    },
+    "screen/ProductDetailScreen.tsx": {
+      "modifiedRanges": [
+        {
+          "start": 1,
+          "end": 656
+        }
+      ],
+      "importsChanged": true,
+      "lastEdit": "2026-05-15T22:58:54.221Z"
+    },
+    "screen/ProductEditScreen.tsx": {
+      "modifiedRanges": [
+        {
+          "start": 1,
+          "end": 730
+        }
+      ],
+      "importsChanged": true,
+      "lastEdit": "2026-05-16T16:50:38.534Z"
+    }
+  },
+  "turnCycles": 0,
+  "maxCycles": 3,
+  "lastUpdated": "2026-05-16T16:50:38.534Z",
+  "sessionId": "lens-mp8jnbgk-d7f06fec"
+}

@@ -1,5 +1,6 @@
 import { apiClient } from '../config/apiClient';
 import type { RecetaDetalle, RecetaSugerida } from '../models';
+import { traducirTexto } from './translationService';
 
 /**
  * Obtener sugerencias de recetas basadas en una lista de ingredientes disponibles.
@@ -14,17 +15,37 @@ export async function sugerirRecetas(
   const response = await apiClient.get<{ recetas: RecetaSugerida[] }>(
     `/api/recetas/sugerir?ingredientes=${encodeURIComponent(ingredientesStr)}&cantidad=${cantidad}&ranking=1`,
   );
-  return response.recetas || [];
+  const recetas = response.recetas || [];
+  // Translate titles in parallel
+  return Promise.all(
+    recetas.map(async (r) => ({
+      ...r,
+      titulo: await traducirTexto(r.titulo),
+    })),
+  );
 }
 
 /**
  * Obtener el detalle completo de una receta por su ID.
+ * Traduce título, instrucciones y nombres de ingredientes al español.
  * @param id - ID de la receta
  */
 export async function obtenerDetalleReceta(
   id: number,
 ): Promise<RecetaDetalle> {
-  return apiClient.get<RecetaDetalle>(`/api/recetas/detalle/${id}`);
+  const data = await apiClient.get<RecetaDetalle>(`/api/recetas/detalle/${id}`);
+  // Translate fields in parallel
+  const [titulo, instrucciones] = await Promise.all([
+    traducirTexto(data.titulo),
+    traducirTexto(data.instrucciones),
+  ]);
+  const ingredientes = await Promise.all(
+    (data.ingredientes ?? []).map(async (ing) => ({
+      ...ing,
+      nombre: await traducirTexto(ing.nombre),
+    })),
+  );
+  return { ...data, titulo, instrucciones, ingredientes };
 }
 
 /**

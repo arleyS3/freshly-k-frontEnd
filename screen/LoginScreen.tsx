@@ -39,12 +39,15 @@ function LoginScreen({ navigation }: LoginScreenProps) {
 		{},
 	);
 
+	const [apiError, setApiError] = useState<string | null>(null);
+
 	const { iniciarSesion } = useAutenticacion();
 
 	/**
 	 * Valida un campo específico y actualiza errores en tiempo real.
 	 */
 	const validarCampo = (campo: "correo" | "contra", valor: string) => {
+		setApiError(null); // Limpiar error de API al editar
 		setErrores((prev) => {
 			const nuevo = { ...prev };
 			if (
@@ -72,6 +75,9 @@ function LoginScreen({ navigation }: LoginScreenProps) {
 	 * automático del stack en el componente raíz.
 	 */
 	const handleLogin = async () => {
+		// Limpiar error previo
+		setApiError(null);
+
 		// Validar campos antes de enviar
 		const nuevosErrores: { correo?: string; contra?: string } = {};
 		if (!correo.trim()) {
@@ -93,7 +99,7 @@ function LoginScreen({ navigation }: LoginScreenProps) {
 		setLoading(false);
 
 		if (!res.ok) {
-			Alert.alert("Error de inicio de sesión", res.message);
+			setApiError(res.message);
 		}
 	};
 
@@ -136,7 +142,7 @@ function LoginScreen({ navigation }: LoginScreenProps) {
 							style={style.textInput}
 							onChangeText={(t) => {
 								setCorreo(t);
-								if (errores.correo) validarCampo("correo", t);
+								if (errores.correo || apiError) validarCampo("correo", t);
 							}}
 							onBlur={() => validarCampo("correo", correo)}
 							placeholder="tu@email.com"
@@ -200,6 +206,17 @@ function LoginScreen({ navigation }: LoginScreenProps) {
 				</View>
 
 				<View style={style.bottomContainer}>
+					{apiError && (
+						<Text
+							style={[
+								style.errorText,
+								{ marginBottom: 16, textAlign: "center" },
+							]}
+						>
+							{apiError}
+						</Text>
+					)}
+
 					<Pressable
 						style={[style.button, loading && style.buttonLoading]}
 						onPress={handleLogin}

@@ -8,8 +8,10 @@ import {
   StyleSheet,
   Text,
   useColorScheme,
+  useWindowDimensions,
   View,
 } from "react-native";
+import RenderHtml from "react-native-render-html";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import type { RecipeDetailScreenProps } from "../navigation/types";
@@ -38,6 +40,7 @@ export default function DetalleReceta({
   navigation,
 }: RecipeDetailScreenProps) {
   const { recetaId } = route.params;
+  const { width } = useWindowDimensions();
   const colorScheme = useColorScheme();
   const colors = getColors(colorScheme ?? "light");
 
@@ -61,6 +64,11 @@ export default function DetalleReceta({
       setLoading(false);
     }
   }, [recetaId]);
+
+  function wrapInHtml(html: string): string {
+    if (html.trim().startsWith("<")) return html;
+    return `<p>${html}</p>`;
+  }
 
   useEffect(() => {
     fetchDetalle();
@@ -143,8 +151,8 @@ export default function DetalleReceta({
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Ingredientes</Text>
             <View style={styles.ingredientsContainer}>
-              {(detalle.ingredientes ?? []).map((ing) => (
-                <View key={ing.id} style={styles.ingredientRow}>
+              {(detalle.ingredientes ?? []).map((ing, index) => (
+                <View key={`${ing.id}-${index}`} style={styles.ingredientRow}>
                   <View style={styles.bullet} />
                   <Text style={styles.ingredientName}>{ing.nombre}</Text>
                   <Text style={styles.ingredientAmount}>
@@ -159,9 +167,23 @@ export default function DetalleReceta({
           {detalle.instrucciones ? (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Instrucciones</Text>
-              <Text style={styles.instructionsText}>
-                {detalle.instrucciones}
-              </Text>
+              <View style={styles.instructionsContainer}>
+                <RenderHtml
+                  contentWidth={width}
+                  source={{ html: wrapInHtml(detalle.instrucciones) }}
+                  baseStyle={{
+                    color: colors.textPrimary,
+                    fontSize: 15,
+                    lineHeight: 24,
+                  }}
+                  tagsStyles={{
+                    ol: { paddingLeft: 20, marginBottom: 8 },
+                    ul: { paddingLeft: 20, marginBottom: 8 },
+                    li: { marginBottom: 4, color: colors.textPrimary },
+                    p: { marginBottom: 8 },
+                  }}
+                />
+              </View>
             </View>
           ) : null}
         </ScrollView>
@@ -346,10 +368,7 @@ function createStyles(c: Colors) {
       color: c.textSecondary,
       fontWeight: "500",
     },
-    instructionsText: {
-      fontSize: 15,
-      color: c.textPrimary,
-      lineHeight: 24,
+    instructionsContainer: {
       backgroundColor: c.surface,
       borderRadius: 16,
       borderWidth: 1.5,

@@ -52,6 +52,8 @@ export default function PantallaRegistro({ navigation }: RegisterScreenProps) {
 		confirmar?: string;
 	}>({});
 
+	const [apiError, setApiError] = useState<string | null>(null);
+
 	const { registrarUsuario } = useAutenticacion();
 
 	/**
@@ -62,6 +64,7 @@ export default function PantallaRegistro({ navigation }: RegisterScreenProps) {
 		valor: string,
 		valorContra?: string,
 	) => {
+		setApiError(null); // Limpiar error de API al editar
 		setErrores((prev) => {
 			const nuevo = { ...prev };
 
@@ -90,7 +93,8 @@ export default function PantallaRegistro({ navigation }: RegisterScreenProps) {
 				// También validar confirmar si ya tiene valor
 				if (valorContra !== undefined && valorContra && valor !== valorContra) {
 					nuevo.confirmar = "Las contraseñas no coinciden";
-				} else {
+				} else if (valorContra !== undefined) {
+					// Si la contra es válida, re-evaluar confirmar
 					delete nuevo.confirmar;
 				}
 			}
@@ -109,6 +113,7 @@ export default function PantallaRegistro({ navigation }: RegisterScreenProps) {
 
 	async function Registrar() {
 		if (isRegistering) return;
+		setApiError(null); // Limpiar error previo
 
 		// Validar todos los campos antes de enviar
 		const nuevosErrores: typeof errores = {};
@@ -153,7 +158,9 @@ export default function PantallaRegistro({ navigation }: RegisterScreenProps) {
 			if (res.ok) {
 				setShowSuccessModal(true);
 			} else {
-				Alert.alert("Error", res.message || "No se pudo crear la cuenta");
+				setApiError(
+					res.message || "No se pudo crear la cuenta. Inténtalo de nuevo.",
+				);
 			}
 		} finally {
 			setIsRegistering(false);
@@ -192,7 +199,7 @@ export default function PantallaRegistro({ navigation }: RegisterScreenProps) {
 						<View
 							style={[
 								styles.inputContainer,
-								errores.nombre && styles.inputError,
+								(errores.nombre || apiError) && styles.inputError,
 							]}
 						>
 							<Feather
@@ -206,7 +213,7 @@ export default function PantallaRegistro({ navigation }: RegisterScreenProps) {
 								style={styles.textInput}
 								onChangeText={(t) => {
 									setNombre(t);
-									if (errores.nombre) validarCampo("nombre", t);
+									validarCampo("nombre", t);
 								}}
 								onBlur={() => validarCampo("nombre", nombre)}
 								placeholder="Tu nombre"
@@ -223,7 +230,7 @@ export default function PantallaRegistro({ navigation }: RegisterScreenProps) {
 						<View
 							style={[
 								styles.inputContainer,
-								errores.correo && styles.inputError,
+								(errores.correo || apiError) && styles.inputError,
 							]}
 						>
 							<Feather
@@ -237,7 +244,7 @@ export default function PantallaRegistro({ navigation }: RegisterScreenProps) {
 								style={styles.textInput}
 								onChangeText={(t) => {
 									setCorreo(t);
-									if (errores.correo) validarCampo("correo", t);
+									validarCampo("correo", t);
 								}}
 								onBlur={() => validarCampo("correo", correo)}
 								placeholder="tu@email.com"
@@ -256,7 +263,7 @@ export default function PantallaRegistro({ navigation }: RegisterScreenProps) {
 						<View
 							style={[
 								styles.inputContainer,
-								errores.contra && styles.inputError,
+								(errores.contra || apiError) && styles.inputError,
 							]}
 						>
 							<Feather
@@ -273,7 +280,7 @@ export default function PantallaRegistro({ navigation }: RegisterScreenProps) {
 									setContra(t);
 									validarCampo("contra", t, confirmarContra);
 								}}
-								onBlur={() => validarCampo("contra", contra)}
+								onBlur={() => validarCampo("contra", contra, confirmarContra)}
 								placeholder="Mínimo 6 caracteres"
 								placeholderTextColor="#9AAAB6"
 								textContentType="newPassword"
@@ -299,7 +306,7 @@ export default function PantallaRegistro({ navigation }: RegisterScreenProps) {
 						<View
 							style={[
 								styles.inputContainer,
-								errores.confirmar && styles.inputError,
+								(errores.confirmar || apiError) && styles.inputError,
 							]}
 						>
 							<Feather
@@ -337,6 +344,17 @@ export default function PantallaRegistro({ navigation }: RegisterScreenProps) {
 						</View>
 						{errores.confirmar && (
 							<Text style={styles.errorText}>{errores.confirmar}</Text>
+						)}
+
+						{apiError && (
+							<Text
+								style={[
+									styles.errorText,
+									{ marginTop: 16, textAlign: "center", fontSize: 14 },
+								]}
+							>
+								{apiError}
+							</Text>
 						)}
 
 						<Pressable
